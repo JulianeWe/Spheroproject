@@ -30,6 +30,7 @@ svg.append("rect").attr("width", 10).attr("height",50).attr("x",250).attr("y",25
         $("#pitch").text("Pitch:" + data.pitchAngle.value[0] + "°");
         $("#roll").text("Roll:" + data.rollAngle.value[0] + "°");
         $("#yaw").text("Yaw:" + data.yawAngle.value[0] + "°");
+        
         var dataArray=[data.pitchAngle.value[0],data.rollAngle.value[0],data.yawAngle.value[0]];
 
         //Transform the data from dataArray into useful stuff for svg objects.
