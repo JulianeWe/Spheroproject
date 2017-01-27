@@ -1,0 +1,19 @@
+{
+  "name": "spheroproject",
+  "version": "1.0.0",
+  "description": "A Sphero project for the course Physical Computing",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha"
+  },
+  "author": "Juliane Wendler & Katja Vock",
+  "license": "ISC",
+  "dependencies": {
+    "express": "3.*",
+    "socket.io": "*",
+    "sphero": "^0.9.2",
+    "serialport": "*",
+    "d3":"*"
+  }
+}
