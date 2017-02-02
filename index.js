@@ -25,7 +25,6 @@ app.get("/", function (req, res) {
 //Belongs to the websocket.
 io.sockets.on("connection", function (socket) {
   //Client connected.
-  //socket.emit("update", { batteryState: 100 , batteryVoltage: 45});
 });
 
 
@@ -58,18 +57,20 @@ orb.connect(function() {
           orb.startCalibration();
           setTimeout(function() {
             orb.finishCalibration();
+            orb.color("FF00FF");
 
             //Gyroscope data of Sphero
-            orb.streamGyroscope(1,false);
+            orb.streamGyroscope(10,false);
             orb.on("gyroscope", function(data) {
               io.sockets.emit("updateGyro", data);
             });
 
             //Streaming of IMU (inertial measurment unit) data
-            orb.streamImuAngles(1, false);
+            orb.streamImuAngles(10, false);
             orb.on("imuAngles", function(data) {
               io.sockets.emit("updateImu", data);
             });
+
 
 
           }, 10000); //10 Sek
