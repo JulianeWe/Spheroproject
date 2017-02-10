@@ -3,13 +3,14 @@
 
 //Required for Sphero.
 var sphero = require("sphero");
-var orb = sphero("/dev/tty.Sphero-ORG-AMP-SPP");
+var conf = require("./config.json");
+var orb = sphero(conf.deviceName);
 //Required for server.
 var express = require("express");
 var app = express();
 var server = require("http").createServer(app);
 var io = require("socket.io").listen(server);
-var conf = require("./config.json");
+
 
 console.log("Starting spheroproject");
 
@@ -35,7 +36,7 @@ io.sockets.on("connection", function (socket) {
 
 //Set color to blue when connected to BT.
 orb.connect(function() {
-   orb.color("#0404B4");
+   orb.color("#0404B4"); //Blue
 
    setTimeout(function(){
         orb.getPowerState(function(err, data) {
@@ -59,11 +60,6 @@ orb.connect(function() {
             orb.finishCalibration();
             orb.color("FF00FF");
 
-            //Gyroscope data of Sphero
-            orb.streamGyroscope(10,false);
-            orb.on("gyroscope", function(data) {
-              io.sockets.emit("updateGyro", data);
-            });
 
             //Streaming of IMU (inertial measurment unit) data
             orb.streamImuAngles(10, false);
@@ -71,9 +67,35 @@ orb.connect(function() {
               io.sockets.emit("updateImu", data);
             });
 
+            //Collision detection
+            orb.detectCollisions(); 
+            orb.on("collision",function(data){
+              io.sockets.emit("collision", data);
+              console.log("collision detected");
+                orb.color("red");
+                 setTimeout(function(){
+                  orb.color("FF00FF");
+                },1000);//1s wait till next reset
+            });
+            
+             orb.streamAccelerometer();
+             orb.on("accelerometer", function(data){
+               var wert =Math.sqrt(Math.pow(data.xAccel.value[0],2) 
+                    + Math.pow(data.yAccel.value[0],2)
+                    + Math.pow(data.zAccel.value[0],2) );
+               if (wert > 10000 )
+                              {
+                                orb.startCalibration();
+                                  setTimeout(function() {
+                                    orb.finishCalibration();
+                                    console.log("finished calibration")
+                                  },5000);
+                              }
+             });
 
+             
 
-          }, 10000); //10 Sek
+          }, 10000); //10s
       });
 
     },10000); //10s

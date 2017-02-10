@@ -7,27 +7,33 @@ $(document).ready(function(){
     var initializeWebsocket = function (obj, cam){
 	var socket = io.connect();
 	var degreeToRadiant = 2*3.14 / 360;
-	var zoomFactor = 0.05;
-	var speedFactor = 0.5;
+	var zoomFactor = 0.01;
+	var speedFactorYaw = 0.5;
+	//var speedFactorRoll = 0.2;
     socket.on("updateBattery", function(data){
     });
     socket.on("updateGyro", function(data) {
 	});
 	
-	// Zoom: move Sphero clock/counterclockwise
-	// Rotate left right
-	// Rotate up down
+	// Zoom: move Sphero forward/backward to zoom into object.
+	// Rotate Sphero clockwise: rotates object clockwise.
     socket.on("updateImu", function(data) { 
-	cam.translateZ(data.yawAngle.value[0] * zoomFactor); 
+	cam.translateZ(data.pitchAngle.value[0] * zoomFactor); 
 	if(cam.position.z < 0) {
 		cam.position.z = 0
 	};
-
-	obj.rotateX(data.pitchAngle.value[0] * degreeToRadiant * 0.2);
-	obj.rotateY(data.rollAngle.value[0] * degreeToRadiant * speedFactor);
-	   
+	obj.rotateY(data.yawAngle.value[0] * degreeToRadiant * speedFactorYaw);
+	//obj.rotateY(data.rollAngle.value[0] * degreeToRadiant * speedFactorRoll); 
     });
-	}
+
+	//Collision of Sphero resets object to its initial position.
+	socket.on("collision", function(data) {
+		camera.position.z = 10;
+	});
+	
+}
+
+	
 
 
     var container, stats;
