@@ -36,7 +36,7 @@ io.sockets.on("connection", function (socket) {
 
 //Set color to blue when connected to BT.
 orb.connect(function() {
-   orb.color("#0404B4"); //Blue
+   orb.color("#0404B4"); //blue
 
    setTimeout(function(){
         orb.getPowerState(function(err, data) {
@@ -58,7 +58,7 @@ orb.connect(function() {
           orb.startCalibration();
           setTimeout(function() {
             orb.finishCalibration();
-            orb.color("FF00FF"); //Blue
+            orb.color("FF00FF"); //magenta
 
 
             //Streaming of IMU (inertial measurment unit) data
@@ -69,6 +69,16 @@ orb.connect(function() {
 
             //Collision detection
             var lastTapTime = 0;
+            var isInvertedMode = false;
+
+             function updateColor(){
+              if (isInvertedMode) {
+                  orb.color("45ED83"); //green
+              } else {
+                  orb.color("FF00FF"); //magenta
+              }
+            }
+
             orb.detectCollisions(); 
             orb.on("collision",function(data){
               if (new Date().getTime() - lastTapTime < 1500){
@@ -79,42 +89,27 @@ orb.connect(function() {
                 setTimeout(function() {
                   orb.finishCalibration();
                   io.sockets.emit("isCalibrating",false);
+                  updateColor();
+                  
                 },5000);
 
               } else {
                 io.sockets.emit("singleTap", data);
                 lastTapTime = new Date().getTime();
+                isInvertedMode = !isInvertedMode;
+                io.sockets.emit("setMode", isInvertedMode);
+                updateColor();
               }
-              /*io.sockets.emit("singleTap", data);
-              console.log("collision detected");
-                orb.color("red");
-                 setTimeout(function(){
-                  orb.color("FF00FF"); //Blue
-                },1000);//1s wait till next reset*/
             });
             
-            // shake with calibration 
-             /*orb.streamAccelerometer();
-             orb.on("accelerometer", function(data){
-               var wert =Math.sqrt(Math.pow(data.xAccel.value[0],2) 
-                    + Math.pow(data.yAccel.value[0],2)
-                    + Math.pow(data.zAccel.value[0],2) );
-               if (wert > 10000 )
-                              {
-                                orb.startCalibration();
-                                  setTimeout(function() {
-                                    orb.finishCalibration();
-                                    console.log("finished calibration")
-                                  },5000);
-                              }
-             });*/
+        
 
              
 
           }, 10000); //10s
       });
 
-    },10000); //10s
+    },5000); //5s
 
   });//orb.connect
  
