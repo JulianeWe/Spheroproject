@@ -74,6 +74,13 @@ orb.connect(function() {
               if (new Date().getTime() - lastTapTime < 1500){
                 io.sockets.emit("doubleTap", data);
                 lastTapTime = 0;
+                orb.startCalibration();
+                io.sockets.emit("isCalibrating",true);
+                setTimeout(function() {
+                  orb.finishCalibration();
+                  io.sockets.emit("isCalibrating",false);
+                },5000);
+
               } else {
                 io.sockets.emit("singleTap", data);
                 lastTapTime = new Date().getTime();

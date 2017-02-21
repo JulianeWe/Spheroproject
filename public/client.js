@@ -9,7 +9,7 @@ $(document).ready(function(){
 	var degreeToRadiant = 2*3.14 / 360;
 	var zoomFactor = 0.02;
 	var speedFactorYaw = 0.8;
-	//var speedFactorRoll = 0.2;
+	var isCalibrating = false; 
     socket.on("updateBattery", function(data){
     });
     socket.on("updateGyro", function(data) {
@@ -17,14 +17,16 @@ $(document).ready(function(){
 	
 	// Zoom: move Sphero forward/backward to zoom into object.
 	// Rotate Sphero clockwise: rotates object clockwise.
+	// If Sphero is not calibrating, code will be executed, else Sphero is calibrating and object will not move at all.
     socket.on("updateImu", function(data) { 
-	cam.translateZ(data.pitchAngle.value[0] * zoomFactor); 
-	if(cam.position.z < 0) {
-		cam.position.z = 0
-	};
-	obj.rotateY(data.yawAngle.value[0] * degreeToRadiant * speedFactorYaw);
-	//obj.rotateY(data.rollAngle.value[0] * degreeToRadiant * speedFactorRoll); 
-    });
+		if (!isCalibrating){
+			cam.translateZ(data.pitchAngle.value[0] * zoomFactor); 
+			if(cam.position.z < 0) {
+				cam.position.z = 0
+			};
+			obj.rotateY(data.yawAngle.value[0] * degreeToRadiant * speedFactorYaw);
+    	}
+	});
 
 	//Single tap of Sphero resets object to its initial position.
 	socket.on("singleTap", function(data) {
@@ -32,9 +34,13 @@ $(document).ready(function(){
 		console.log("Sphero single tapped - works");
 	});
 
-	//Double tap of Sphero for calibration
+	//Double tap of Sphero for calibration.
 	socket.on("doubleTap", function(data) {
 		console.log("Sphero double tapped - works");
+	});
+	// Update wether Sphero is calibrating or not.
+	socket.on("isCalibrating", function(data) {
+		isCalibrating = data;
 	});
 	
 }
