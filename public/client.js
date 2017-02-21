@@ -7,8 +7,8 @@ $(document).ready(function(){
     var initializeWebsocket = function (obj, cam){
 	var socket = io.connect();
 	var degreeToRadiant = 2*3.14 / 360;
-	var zoomFactor = 0.01;
-	var speedFactorYaw = 0.5;
+	var zoomFactor = 0.02;
+	var speedFactorYaw = 0.8;
 	//var speedFactorRoll = 0.2;
     socket.on("updateBattery", function(data){
     });
@@ -26,9 +26,15 @@ $(document).ready(function(){
 	//obj.rotateY(data.rollAngle.value[0] * degreeToRadiant * speedFactorRoll); 
     });
 
-	//Collision of Sphero resets object to its initial position.
-	socket.on("collision", function(data) {
+	//Single tap of Sphero resets object to its initial position.
+	socket.on("singleTap", function(data) {
 		camera.position.z = 10;
+		console.log("Sphero single tapped - works");
+	});
+
+	//Double tap of Sphero for calibration
+	socket.on("doubleTap", function(data) {
+		console.log("Sphero double tapped - works");
 	});
 	
 }
