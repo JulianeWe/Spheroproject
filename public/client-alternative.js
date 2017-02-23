@@ -10,8 +10,9 @@ $(document).ready(function(){
 	var zoomFactor = 0.02;
 	var speedFactor = 0.3;
 	var isCalibrating = false; 
-	var lastImuData = [0,0,0]; //yaw, pitch, roll
-	
+	var invertedMode = false;
+	var lastImuData = [0,0,0]; //yaw,pitch,roll
+
     socket.on("updateBattery", function(data){
     });
     socket.on("updateGyro", function(data) {
@@ -21,35 +22,42 @@ $(document).ready(function(){
 	// Rotate Sphero clockwise: rotates object clockwise.
 	// If Sphero is not calibrating, code will be executed, else Sphero is calibrating and object will not move at all.
     socket.on("updateImu", function(data) { 
-		var currentImuData = [data.yawAngle.value[0],data.pitchAngle.value[0],data.rollAngle.value[0]];
-	
+		var currentImuData = [data.yawAngle.value[0],data.pitchAngle.value[0],data.rollAngle.value[0]]
 		if (!isCalibrating){
-			var rotationAngle = (lastImuData[0] + currentImuData[0]) / 2;
-			var translationDistance = (lastImuData[1] + currentImuData[1]) / 2;
-				
-			cam.translateZ(translationDistance * zoomFactor); 
-			obj.rotateY(rotationAngle * degreeToRadiant * speedFactor);
-	
+			if (invertedMode){
+				var rotationAngle =	(currentImuData[0] + lastImuData[0]) / 2; //smoothing
+				obj.rotateY(rotationAngle * degreeToRadiant * speedFactor);
+			} else {
+				var translationDistance = (currentImuData[1] + lastImuData[1]) / 2; //smoothing
+				cam.translateZ(translationDistance * zoomFactor); 	
+			}
 			if(cam.position.z < 0) {
 				cam.position.z = 0
 			};
-			lastImuData = currentImuData; 
     	}
+		lastImuData = currentImuData;
 	});
 
 	//Single tap of Sphero resets object to its initial position.
 	socket.on("singleTap", function(data) {
-		camera.position.z = 15;
 		console.log("Sphero single tapped - works");
 	});
 
+	//Double tap of Sphero for calibration.
+	socket.on("doubleTap", function(data) {
+		camera.position.z = 15;
+		console.log("Sphero double tapped - works");
+	});
 	// Update wether Sphero is calibrating or not.
 	socket.on("isCalibrating", function(data) {
 		isCalibrating = data;
 	});
+
+	socket.on("setMode", function(data){
+		invertedMode = data;
+	});
+	
 }
-
-
     var container, stats;
 			var camera, scene, renderer;
 			var mouseX = 0, mouseY = 0;
@@ -88,6 +96,7 @@ $(document).ready(function(){
 					objLoader.setMaterials( materials );
 					objLoader.setPath( 'OBJ_Format/' );
 					objLoader.load( 'Animal_Cell_smooth.obj', function ( object ) {
+					
 						scene.add( object );
 
 						initializeWebsocket(object, camera);
@@ -126,8 +135,16 @@ $(document).ready(function(){
 			}
 			
 			function render() {
+				//camera.position.x += ( mouseX - camera.position.x ) * .05;
+				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 				renderer.render( scene, camera );
 			}
+
+
+
+
+
+
 });
 

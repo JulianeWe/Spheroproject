@@ -16,12 +16,13 @@ console.log("Starting spheroproject");
 
 server.listen(conf.port);
 //File of public, handed over to visitor.
+app.get("/", function (req, res) {
+  res.sendfile(__dirname + "/public/index-alternative.html");
+});
 app.configure(function(){
    app.use(express.static(__dirname + "/public")); 
 });
-app.get("/", function (req, res) {
-  res.sendfile(__dirname + "/public/index.html");
-});
+
 
 //Belongs to the websocket.
 io.sockets.on("connection", function (socket) {
@@ -68,24 +69,49 @@ orb.connect(function() {
             });
 
             //Collision detection
+            var lastTapTime = 0;
+            var isInvertedMode = false;
+
              function updateColor(){
-               orb.color("FF00FF"); //magenta
+              if (isInvertedMode) {
+                  orb.color("45ED83"); //green
+              } else {
+                  orb.color("FF00FF"); //magenta
               }
+            }
 
             orb.detectCollisions(); 
             orb.on("collision",function(data){
+              if (new Date().getTime() - lastTapTime < 1500){
+                io.sockets.emit("doubleTap", data);
+                lastTapTime = 0;
                 orb.startCalibration();
                 io.sockets.emit("isCalibrating",true);
                 setTimeout(function() {
                   orb.finishCalibration();
                   io.sockets.emit("isCalibrating",false);
-                  updateColor();        
+                  updateColor();
+                  
                 },5000);
-                io.sockets.emit("singleTap", data);   
+
+              } else {
+                io.sockets.emit("singleTap", data);
+                lastTapTime = new Date().getTime();
+                isInvertedMode = !isInvertedMode;
+                io.sockets.emit("setMode", isInvertedMode);
+                updateColor();
+              }
             });
+            
+        
+
+             
+
           }, 10000); //10s
       });
+
     },5000); //5s
+
   });//orb.connect
  
 

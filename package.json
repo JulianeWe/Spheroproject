@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "mocha"
+    "alternative": "node index-alternative.js"
   },
   "author": "Juliane Wendler & Katja Vock",
   "license": "ISC",
