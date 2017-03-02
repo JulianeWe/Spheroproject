@@ -89,12 +89,12 @@ $(document).ready(function(){
 				var onError = function ( xhr ) { };
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 				var mtlLoader = new THREE.MTLLoader();
-					mtlLoader.setPath( 'OBJ_Format/' );
+					mtlLoader.setPath( 'OBJ_Format/' ); //load object here
 				mtlLoader.load( 'Animal_Cell_smooth.mtl', function( materials ) {
 					materials.preload();
 					var objLoader = new THREE.OBJLoader();
 					objLoader.setMaterials( materials );
-					objLoader.setPath( 'OBJ_Format/' );
+					objLoader.setPath( 'OBJ_Format/' ); //load object here
 					objLoader.load( 'Animal_Cell_smooth.obj', function ( object ) {
 					
 						scene.add( object );
@@ -135,16 +135,8 @@ $(document).ready(function(){
 			}
 			
 			function render() {
-				//camera.position.x += ( mouseX - camera.position.x ) * .05;
-				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 				renderer.render( scene, camera );
 			}
-
-
-
-
-
-
 });
 

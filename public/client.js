@@ -81,12 +81,12 @@ $(document).ready(function(){
 				var onError = function ( xhr ) { };
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 				var mtlLoader = new THREE.MTLLoader();
-					mtlLoader.setPath( 'OBJ_Format/' );
+					mtlLoader.setPath( 'OBJ_Format/' ); //load object here
 				mtlLoader.load( 'Animal_Cell_smooth.mtl', function( materials ) {
 					materials.preload();
 					var objLoader = new THREE.OBJLoader();
 					objLoader.setMaterials( materials );
-					objLoader.setPath( 'OBJ_Format/' );
+					objLoader.setPath( 'OBJ_Format/' ); //load object here
 					objLoader.load( 'Animal_Cell_smooth.obj', function ( object ) {
 						scene.add( object );
 
