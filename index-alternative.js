@@ -29,12 +29,6 @@ io.sockets.on("connection", function (socket) {
   //Client connected.
 });
 
-
-
-
-
-
-
 //Set color to blue when connected to BT.
 orb.connect(function() {
    orb.color("#0404B4"); //blue
@@ -102,11 +96,6 @@ orb.connect(function() {
                 updateColor();
               }
             });
-            
-        
-
-             
-
           }, 10000); //10s
       });
 

@@ -58,6 +58,7 @@ $(document).ready(function(){
 	});
 	
 }
+// https://threejs.org/examples/#webgl_loader_obj_mtl adjusted
     var container, stats;
 			var camera, scene, renderer;
 			var mouseX = 0, mouseY = 0;
